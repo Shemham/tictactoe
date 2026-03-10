@@ -1,0 +1,8 @@
+node_modules/
+.gradle/
+tictactoe-app/android/.gradle/
+tictactoe-app/android/build/
+tictactoe-app/android/app/build/
+tictactoe-app/android/local.properties
+tictactoe-app/node_modules/
+*.keystore
