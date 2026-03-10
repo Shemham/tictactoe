@@ -55,5 +55,7 @@ cp tictactoe-app/android/app/build/outputs/apk/debug/app-debug.apk TicTacToe.apk
 
 ## Git & GitHub
 
-- Always commit with clean messages and push to `https://github.com/Shemham/tictactoe`
-- This applies to all projects — always init a git repo and create a GitHub repo for new projects
+- **Commit and push frequently** — after every meaningful unit of work (feature added, bug fixed, file created, build succeeded). Never let significant progress sit uncommitted.
+- Commit messages must be clean and descriptive — summarise *what* changed and *why*, not just "update files".
+- Push to `https://github.com/Shemham/tictactoe` after every commit so the remote is always up to date.
+- This applies to all projects — always init a git repo and create a GitHub repo for new projects, then keep committing and pushing throughout the work.
