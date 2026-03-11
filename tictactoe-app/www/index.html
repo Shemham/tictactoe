@@ -1,263 +1,668 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tic Tac Toe</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dragon Warlords</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0f1a0f;color:#e8d5a3;font-family:'Georgia','Times New Roman',serif;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+h1{font-size:2.2rem;color:#ffd700;text-shadow:0 0 24px rgba(255,180,0,0.5);letter-spacing:4px;margin:18px 0 4px;text-align:center}
+.subtitle{color:#aa8844;font-style:italic;margin-bottom:18px;font-size:0.9rem}
 
-    body {
-      background: #1a1a2e;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      font-family: 'Segoe UI', sans-serif;
-      color: #eee;
-    }
+/* SETUP */
+#setup-screen{background:rgba(20,14,6,0.95);border:2px solid #5a3c1e;border-radius:12px;padding:28px 36px;width:480px;max-width:95vw}
+.setup-section{margin-bottom:20px}
+.setup-section h3{color:#ffd700;margin-bottom:10px;font-size:0.85rem;text-transform:uppercase;letter-spacing:2px}
+.count-btns{display:flex;gap:10px}
+.count-btn{flex:1;padding:11px;background:#1e1206;border:2px solid #3a2a14;color:#e8d5a3;font-family:inherit;font-size:1.1rem;cursor:pointer;border-radius:6px;transition:all .2s}
+.count-btn:hover,.count-btn.active{background:#2e1e0a;border-color:#ffd700;color:#ffd700}
+.player-rows{display:flex;flex-direction:column;gap:8px}
+.player-row{display:flex;align-items:center;gap:10px}
+.pdot{width:18px;height:18px;border-radius:50%;flex-shrink:0;border:2px solid rgba(255,255,255,0.2)}
+.pname{flex:1;background:#1e1206;border:1px solid #3a2a14;color:#e8d5a3;padding:7px 10px;font-family:inherit;font-size:0.88rem;border-radius:4px}
+.ptype{display:flex;border:1px solid #3a2a14;border-radius:4px;overflow:hidden}
+.type-btn{padding:6px 12px;background:#1e1206;border:none;color:#666;font-family:inherit;font-size:0.78rem;cursor:pointer;transition:all .2s}
+.type-btn.active{background:#2e1e0a;color:#ffd700}
+.start-btn{width:100%;padding:14px;background:linear-gradient(135deg,#7a1212,#bb1e1e);border:2px solid #ee3333;color:#fff;font-family:inherit;font-size:1.1rem;font-weight:bold;letter-spacing:3px;cursor:pointer;border-radius:8px;text-transform:uppercase;transition:all .3s;margin-top:8px}
+.start-btn:hover{background:linear-gradient(135deg,#9a1818,#dd2a2a);box-shadow:0 0 20px rgba(220,40,40,0.4)}
 
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 0.5rem;
-      letter-spacing: 2px;
-      color: #e94560;
-    }
+/* GAME */
+#game-screen{display:none;width:100%;max-width:1140px;padding:0 8px 20px}
+.game-layout{display:flex;gap:12px;align-items:flex-start}
+#map-container{flex:1;background:#0a140a;border:2px solid #2a4a2a;border-radius:10px;overflow:hidden}
+#game-map{width:100%;display:block}
+#game-panel{width:230px;flex-shrink:0;display:flex;flex-direction:column;gap:10px}
+.pbox{background:rgba(14,10,4,0.95);border:1px solid #3a2a14;border-radius:8px;padding:12px}
+.pbox h3{color:#ffd700;font-size:0.75rem;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;border-bottom:1px solid #3a2a14;padding-bottom:5px}
+.cur-name{font-size:1.1rem;margin-bottom:3px}
+.turn-badge{font-size:0.72rem;color:#888;margin-bottom:4px}
+.phase-text{font-size:0.78rem;color:#aaa;font-style:italic}
+.move-info{font-size:0.82rem;line-height:1.65;color:#ccc}
+.hl{color:#ffd700;font-weight:bold}
+.slider-wrap{margin-top:10px}
+.slider-wrap label{font-size:0.78rem;color:#aaa;display:block;margin-bottom:3px}
+#dragon-slider{width:100%;accent-color:#cc2222}
+.slider-val{text-align:center;font-size:1.1rem;color:#ffd700;margin-top:3px}
+.abtn{width:100%;padding:9px;border-radius:5px;border:none;font-family:inherit;font-size:0.88rem;cursor:pointer;transition:all .2s;margin-top:5px}
+.btn-ok{background:#1e5a24;color:#aaffaa;border:1px solid #3a9944}
+.btn-ok:hover{background:#256630}
+.btn-no{background:#3e1818;color:#ffaaaa;border:1px solid #772222}
+.btn-no:hover{background:#4e2020}
+.btn-end{background:linear-gradient(135deg,#3a1e00,#6a3300);color:#ffcc88;border:1px solid #994400;font-size:0.95rem;padding:11px;letter-spacing:1px}
+.btn-end:hover{background:linear-gradient(135deg,#4a2800,#7a3e00)}
+.btn-end:disabled{opacity:0.38;cursor:default}
+.pentry{display:flex;align-items:center;gap:7px;padding:5px 0;font-size:0.82rem;border-bottom:1px solid rgba(255,255,255,0.05)}
+.pentry:last-child{border-bottom:none}
+.pdot2{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+.pstats{flex:1}
+.psub{font-size:0.72rem;color:#888}
+.pelim{opacity:.38;text-decoration:line-through}
+#event-log{max-height:160px;overflow-y:auto;font-size:0.73rem;line-height:1.7;color:#aaa}
+#event-log::-webkit-scrollbar{width:3px}
+#event-log::-webkit-scrollbar-thumb{background:#3a2a14;border-radius:2px}
+.le{margin-bottom:1px}
+.le-combat{color:#ff9977}
+.le-capture{color:#ffdd66}
+.le-turn{color:#88aaff;border-top:1px solid rgba(255,255,255,0.07);padding-top:3px;margin-top:3px}
+.leg-item{display:flex;align-items:center;gap:7px;font-size:0.76rem;margin-bottom:5px;color:#bbb}
 
-    #status {
-      font-size: 1.2rem;
-      margin-bottom: 1.5rem;
-      min-height: 1.5em;
-      color: #a8dadc;
-    }
-
-    #board {
-      display: grid;
-      grid-template-columns: repeat(3, 110px);
-      grid-template-rows: repeat(3, 110px);
-      gap: 8px;
-    }
-
-    .cell {
-      background: #16213e;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 3.5rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.15s, transform 0.1s;
-      user-select: none;
-      border: 2px solid #0f3460;
-    }
-
-    .cell:hover:not(.taken) {
-      background: #0f3460;
-      transform: scale(1.05);
-    }
-
-    .cell.x { color: #e94560; }
-    .cell.o { color: #a8dadc; }
-
-    .cell.win {
-      background: #0f3460;
-      border-color: #e94560;
-      animation: pulse 0.5s ease;
-    }
-
-    @keyframes pulse {
-      0%   { transform: scale(1); }
-      50%  { transform: scale(1.1); }
-      100% { transform: scale(1); }
-    }
-
-    #controls {
-      display: flex;
-      gap: 12px;
-      margin-top: 1.5rem;
-    }
-
-    button {
-      padding: 0.6rem 1.4rem;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: opacity 0.15s, transform 0.1s;
-    }
-
-    button:hover { opacity: 0.85; transform: scale(1.04); }
-
-    #restart {
-      background: #e94560;
-      color: #fff;
-    }
-
-    #mode-toggle {
-      background: #0f3460;
-      color: #a8dadc;
-      border: 2px solid #a8dadc;
-    }
-
-    #scores {
-      display: flex;
-      gap: 2rem;
-      margin-top: 1.2rem;
-      font-size: 1rem;
-    }
-
-    .score-box {
-      text-align: center;
-      background: #16213e;
-      border-radius: 10px;
-      padding: 0.5rem 1.2rem;
-      border: 2px solid #0f3460;
-    }
-
-    .score-box span {
-      display: block;
-      font-size: 1.6rem;
-      font-weight: bold;
-    }
-
-    .score-box.x-score span { color: #e94560; }
-    .score-box.o-score span { color: #a8dadc; }
-    .score-box.draw-score span { color: #888; }
-  </style>
+/* VICTORY */
+#voverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.82);align-items:center;justify-content:center;z-index:100}
+#voverlay.show{display:flex}
+.vbox{background:#0f1a0f;border:3px solid #ffd700;border-radius:16px;padding:46px 56px;text-align:center;box-shadow:0 0 60px rgba(255,215,0,0.25)}
+.vtitle{font-size:1.1rem;color:#aa8844;margin-bottom:8px;letter-spacing:4px;text-transform:uppercase}
+.vname{font-size:2.3rem;text-shadow:0 0 20px rgba(255,215,0,0.5);margin-bottom:8px}
+.vsub{font-size:0.9rem;color:#888;margin-bottom:28px;font-style:italic}
+.vagain{padding:12px 36px;background:linear-gradient(135deg,#4a2a00,#7a4400);border:2px solid #ffd700;color:#ffd700;font-family:inherit;font-size:1rem;cursor:pointer;border-radius:8px;letter-spacing:2px;transition:all .3s}
+.vagain:hover{background:linear-gradient(135deg,#5a3600,#8a5000);box-shadow:0 0 20px rgba(255,215,0,0.3)}
+</style>
 </head>
 <body>
-  <h1>Tic Tac Toe</h1>
-  <div id="status">Player X's turn</div>
-  <div id="board"></div>
-  <div id="controls">
-    <button id="restart">Restart</button>
-    <button id="mode-toggle">vs CPU</button>
+<h1>&#9876; DRAGON WARLORDS &#9876;</h1>
+<p class="subtitle">Command your dragon armies. Conquer the realm.</p>
+
+<div id="setup-screen">
+  <div class="setup-section">
+    <h3>Number of Warlords</h3>
+    <div class="count-btns">
+      <button class="count-btn" data-n="2">2</button>
+      <button class="count-btn active" data-n="3">3</button>
+      <button class="count-btn" data-n="4">4</button>
+    </div>
   </div>
-  <div id="scores">
-    <div class="score-box x-score">X<span id="score-x">0</span></div>
-    <div class="score-box draw-score">Draws<span id="score-d">0</span></div>
-    <div class="score-box o-score">O<span id="score-o">0</span></div>
+  <div class="setup-section">
+    <h3>Players</h3>
+    <div class="player-rows" id="player-rows"></div>
   </div>
+  <button class="start-btn" onclick="startGame()">&#128293; Unleash the Dragons</button>
+</div>
 
-  <script>
-    const boardEl = document.getElementById('board');
-    const statusEl = document.getElementById('status');
-    const restartBtn = document.getElementById('restart');
-    const modeBtn = document.getElementById('mode-toggle');
-    const scoreX = document.getElementById('score-x');
-    const scoreO = document.getElementById('score-o');
-    const scoreD = document.getElementById('score-d');
+<div id="game-screen">
+  <div class="game-layout">
+    <div id="map-container">
+      <svg id="game-map" viewBox="0 0 900 580" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="mapBg" cx="50%" cy="50%" r="70%">
+            <stop offset="0%" stop-color="#162216"/>
+            <stop offset="100%" stop-color="#0a120a"/>
+          </radialGradient>
+        </defs>
+        <rect width="900" height="580" fill="url(#mapBg)"/>
+        <g stroke="#1a2e1a" stroke-width="1" opacity="0.3">
+          <line x1="0" y1="145" x2="900" y2="145"/>
+          <line x1="0" y1="290" x2="900" y2="290"/>
+          <line x1="0" y1="435" x2="900" y2="435"/>
+          <line x1="225" y1="0" x2="225" y2="580"/>
+          <line x1="450" y1="0" x2="450" y2="580"/>
+          <line x1="675" y1="0" x2="675" y2="580"/>
+        </g>
+        <g id="conn-layer"></g>
+        <g id="terr-layer"></g>
+      </svg>
+    </div>
+    <div id="game-panel">
+      <div class="pbox" id="turn-box">
+        <h3>Current Warlord</h3>
+        <div class="cur-name" id="cur-name">-</div>
+        <div class="turn-badge" id="turn-badge">Round 1</div>
+        <div class="phase-text" id="phase-text">-</div>
+      </div>
+      <div class="pbox">
+        <h3>Action</h3>
+        <div class="move-info" id="move-info">Select a territory to move from.</div>
+        <div id="slider-sec" style="display:none">
+          <div class="slider-wrap">
+            <label>Dragons to send: <span id="sval">1</span></label>
+            <input type="range" id="dragon-slider" min="1" max="10" value="1">
+          </div>
+          <button class="abtn btn-ok" onclick="confirmMove()">&#9876; Attack / Move</button>
+          <button class="abtn btn-no" onclick="cancelMove()">&#10005; Cancel</button>
+        </div>
+        <button class="abtn btn-end" id="end-btn" onclick="endPlayerTurn()">End Turn &#8250;</button>
+      </div>
+      <div class="pbox">
+        <h3>Warlords</h3>
+        <div id="players-list"></div>
+      </div>
+      <div class="pbox">
+        <h3>Legend</h3>
+        <div class="leg-item"><svg width="20" height="20"><circle cx="10" cy="10" r="8" fill="#2a2a2a" stroke="#666" stroke-width="1.5"/></svg>Territory (+1/round)</div>
+        <div class="leg-item"><svg width="20" height="20"><polygon points="10,2 12.5,7.5 18.5,8.2 14,12.5 15.3,18.5 10,15.5 4.7,18.5 6,12.5 1.5,8.2 7.5,7.5" fill="#2a2a2a" stroke="#ffd700" stroke-width="1.5"/></svg>Stronghold (+2/round)</div>
+        <div class="leg-item"><svg width="20" height="20"><rect x="3" y="8" width="14" height="10" fill="#2a2a2a" stroke="#aa8844" stroke-width="1.5" rx="1"/><rect x="4" y="4" width="3" height="5" fill="#2a2a2a" stroke="#aa8844" stroke-width="1"/><rect x="13" y="4" width="3" height="5" fill="#2a2a2a" stroke="#aa8844" stroke-width="1"/></svg>Capital (+2/round)</div>
+      </div>
+      <div class="pbox">
+        <h3>Battle Log</h3>
+        <div id="event-log"></div>
+      </div>
+    </div>
+  </div>
+</div>
 
-    const WINS = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+<div id="voverlay">
+  <div class="vbox">
+    <div class="vtitle">&#127942; Victory!</div>
+    <div class="vname" id="vname">-</div>
+    <div class="vsub" id="vsub">-</div>
+    <button class="vagain" onclick="returnToSetup()">Play Again</button>
+  </div>
+</div>
 
-    let board, current, gameOver, vsCPU;
-    let scores = { X: 0, O: 0, D: 0 };
-    vsCPU = false;
+<script>
+// ── TERRITORY DATA ──────────────────────────────────────────────────────────
+const TDEFS = [
+  {id:0, name:'Ironhold',   x:110, y:145, type:'capital'},
+  {id:1, name:'Embervast',  x:790, y:145, type:'capital'},
+  {id:2, name:'Cinderpeak', x:110, y:435, type:'capital'},
+  {id:3, name:'Goldenhall', x:790, y:435, type:'capital'},
+  {id:4, name:'Ashvale',    x:265, y:205, type:'normal'},
+  {id:5, name:'Greystone',  x:635, y:205, type:'normal'},
+  {id:6, name:'Marshgate',  x:265, y:375, type:'normal'},
+  {id:7, name:'Dusthaven',  x:635, y:375, type:'normal'},
+  {id:8, name:'Thornwood',  x:450, y:120, type:'stronghold'},
+  {id:9, name:'Skullrock',  x:450, y:460, type:'stronghold'},
+  {id:10,name:'Ridgepeak',  x:370, y:290, type:'stronghold'},
+  {id:11,name:'Voidspire',  x:530, y:290, type:'stronghold'},
+];
 
-    function init() {
-      board = Array(9).fill('');
-      current = 'X';
-      gameOver = false;
-      statusEl.textContent = `Player X's turn`;
-      render();
-    }
+const EDGES = [
+  [0,4],[0,6],
+  [1,5],[1,7],
+  [2,6],[2,9],
+  [3,7],[3,9],
+  [4,8],[4,10],[4,6],
+  [5,8],[5,11],[5,7],
+  [6,10],[7,11],
+  [8,10],[8,11],
+  [9,10],[9,11],
+  [10,11]
+];
 
-    function render() {
-      boardEl.innerHTML = '';
-      board.forEach((val, i) => {
-        const cell = document.createElement('div');
-        cell.className = 'cell' + (val ? ` ${val.toLowerCase()} taken` : '');
-        cell.textContent = val;
-        cell.addEventListener('click', () => handleClick(i));
-        boardEl.appendChild(cell);
-      });
-    }
+const PCOLORS = ['#cc3333','#3366cc','#22aa44','#bb44cc'];
+const PLIGHT  = ['#ff9999','#99bbff','#99ffbb','#ddaaff'];
+const PDEFNAMES = ['Warlord Moran','Warlord Kael','Warlord Vira','Warlord Dusk'];
 
-    function handleClick(i) {
-      if (gameOver || board[i]) return;
-      if (vsCPU && current === 'O') return;
-      play(i);
-      if (!gameOver && vsCPU && current === 'O') {
-        setTimeout(cpuMove, 350);
-      }
-    }
+function getNeighbors(id) {
+  return EDGES.flatMap(([a,b]) => a===id ? [b] : b===id ? [a] : []);
+}
 
-    function play(i) {
-      board[i] = current;
-      const winLine = checkWin(board, current);
-      if (winLine) {
-        endGame(current, winLine);
-      } else if (board.every(c => c)) {
-        endGame(null);
-      } else {
-        current = current === 'X' ? 'O' : 'X';
-        const label = (vsCPU && current === 'O') ? 'CPU (O)' : `Player ${current}`;
-        statusEl.textContent = `${label}'s turn`;
-      }
-      render();
-      if (winLine) highlightWin(winLine);
-    }
+// ── SETUP UI ────────────────────────────────────────────────────────────────
+let setup = {
+  count: 3,
+  players: [
+    {name:'Player 1', human:true},
+    {name:'Player 2', human:false},
+    {name:'Player 3', human:false},
+    {name:'Player 4', human:false},
+  ]
+};
 
-    function checkWin(b, player) {
-      return WINS.find(line => line.every(i => b[i] === player)) || null;
-    }
-
-    function endGame(winner, winLine) {
-      gameOver = true;
-      if (winner) {
-        const label = (vsCPU && winner === 'O') ? 'CPU wins!' : `Player ${winner} wins!`;
-        statusEl.textContent = label;
-        scores[winner]++;
-      } else {
-        statusEl.textContent = "It's a draw!";
-        scores.D++;
-      }
-      scoreX.textContent = scores.X;
-      scoreO.textContent = scores.O;
-      scoreD.textContent = scores.D;
-    }
-
-    function highlightWin(line) {
-      const cells = boardEl.querySelectorAll('.cell');
-      line.forEach(i => cells[i].classList.add('win'));
-    }
-
-    // Minimax CPU
-    function cpuMove() {
-      const best = minimax(board, 'O', 0);
-      play(best.index);
-    }
-
-    function minimax(b, player, depth) {
-      const opp = player === 'O' ? 'X' : 'O';
-      if (checkWin(b, 'O')) return { score: 10 - depth };
-      if (checkWin(b, 'X')) return { score: depth - 10 };
-      const empty = b.reduce((a, v, i) => v === '' ? [...a, i] : a, []);
-      if (!empty.length) return { score: 0 };
-
-      const moves = empty.map(i => {
-        const nb = [...b];
-        nb[i] = player;
-        const result = minimax(nb, opp, depth + 1);
-        return { index: i, score: result.score };
-      });
-
-      return moves.reduce((best, m) =>
-        player === 'O' ? (m.score > best.score ? m : best)
-                        : (m.score < best.score ? m : best)
-      );
-    }
-
-    restartBtn.addEventListener('click', init);
-    modeBtn.addEventListener('click', () => {
-      vsCPU = !vsCPU;
-      modeBtn.textContent = vsCPU ? 'vs Human' : 'vs CPU';
-      init();
+function initSetup() {
+  document.querySelectorAll('.count-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      setup.count = +btn.dataset.n;
+      document.querySelectorAll('.count-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderSetup();
     });
+  });
+  renderSetup();
+}
 
-    init();
-  </script>
+function renderSetup() {
+  const c = document.getElementById('player-rows');
+  c.innerHTML = '';
+  for (let i = 0; i < setup.count; i++) {
+    const p = setup.players[i];
+    const d = document.createElement('div');
+    d.className = 'player-row';
+    d.innerHTML = `
+      <div class="pdot" style="background:${PCOLORS[i]}"></div>
+      <input class="pname" type="text" value="${p.name}" oninput="setup.players[${i}].name=this.value">
+      <div class="ptype">
+        <button class="type-btn${p.human?' active':''}" onclick="setType(${i},true)">Human</button>
+        <button class="type-btn${!p.human?' active':''}" onclick="setType(${i},false)">AI</button>
+      </div>`;
+    c.appendChild(d);
+  }
+}
+
+function setType(i, human) {
+  setup.players[i].human = human;
+  renderSetup();
+}
+
+// ── GAME STATE ───────────────────────────────────────────────────────────────
+let G = {};
+
+function startGame() {
+  const n = setup.count;
+  const players = [];
+  for (let i = 0; i < n; i++) {
+    players.push({
+      id: i, name: setup.players[i].name,
+      human: setup.players[i].human,
+      color: PCOLORS[i], light: PLIGHT[i], elim: false
+    });
+  }
+
+  const territories = TDEFS.map(def => {
+    let owner = -1, dragons = 2;
+    if (def.type === 'capital' && def.id < n) { owner = def.id; dragons = 8; }
+    else if (def.type === 'capital') { dragons = 3; }
+    else if (def.type === 'stronghold') { dragons = 3; }
+    return { ...def, owner, dragons, neighbors: getNeighbors(def.id) };
+  });
+
+  G = {
+    players, territories,
+    cur: 0, round: 1,
+    phase: 'select-src', // select-src | select-dst | confirm | ai | gameover
+    src: null, dst: null,
+    movesDone: 0,
+    log: [], gameOver: false, winner: null
+  };
+
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('game-screen').style.display = 'block';
+  renderAll();
+  addLog('turn', `Round 1 — ${G.players[0].name}'s turn.`);
+  if (!G.players[0].human) scheduleAI();
+}
+
+// ── GAME LOGIC ───────────────────────────────────────────────────────────────
+function production() {
+  for (const t of G.territories) {
+    if (t.owner >= 0) {
+      t.dragons += (t.type === 'stronghold' || t.type === 'capital') ? 2 : 1;
+    }
+  }
+}
+
+function selectTerritory(id) {
+  if (G.phase === 'gameover' || G.phase === 'ai' || G.phase === 'confirm') return;
+  const t = G.territories[id];
+
+  if (G.phase === 'select-src') {
+    if (t.owner !== G.cur || t.dragons <= 1) return;
+    G.src = id; G.phase = 'select-dst'; renderAll();
+
+  } else if (G.phase === 'select-dst') {
+    if (id === G.src) { G.src = null; G.phase = 'select-src'; renderAll(); return; }
+    const src = G.territories[G.src];
+    if (!src.neighbors.includes(id)) return;
+    G.dst = id; G.phase = 'confirm';
+    const max = src.dragons - 1;
+    const sl = document.getElementById('dragon-slider');
+    sl.max = max; sl.value = Math.min(max, Math.ceil(max * 0.7));
+    document.getElementById('sval').textContent = sl.value;
+    renderAll();
+  }
+}
+
+function confirmMove() {
+  const count = +document.getElementById('dragon-slider').value;
+  execMove(G.src, G.dst, count);
+  G.src = null; G.dst = null; G.phase = 'select-src'; G.movesDone++;
+  renderAll();
+  checkWin();
+}
+
+function cancelMove() {
+  G.src = null; G.dst = null; G.phase = 'select-src'; renderAll();
+}
+
+function execMove(from, to, count) {
+  const src = G.territories[from];
+  const dst = G.territories[to];
+  const attName = G.players[G.cur].name;
+  src.dragons -= count;
+
+  if (dst.owner === G.cur) {
+    dst.dragons += count;
+    addLog('', `${attName} reinforced ${dst.name} (+${count}).`);
+  } else {
+    const defName = dst.owner >= 0 ? G.players[dst.owner].name : 'neutral';
+    addLog('combat', `\u2694 ${attName} attacks ${dst.name} [${defName}] with ${count} dragons.`);
+    if (count > dst.dragons) {
+      const prev = dst.owner;
+      dst.owner = G.cur; dst.dragons = count - dst.dragons;
+      addLog('capture', `\u2605 ${attName} captured ${dst.name}! (${dst.dragons} remain)`);
+      if (prev >= 0) checkElim(prev);
+    } else {
+      dst.dragons -= count;
+      addLog('combat', `\u2717 Attack repelled! ${dst.name} holds with ${dst.dragons}.`);
+    }
+  }
+}
+
+function checkElim(pid) {
+  if (G.territories.some(t => t.owner === pid)) return;
+  G.players[pid].elim = true;
+  addLog('capture', `\u2620 ${G.players[pid].name} has been eliminated!`);
+}
+
+function checkWin() {
+  const active = G.players.filter(p => !p.elim);
+  if (active.length === 1) { doVictory(active[0]); return true; }
+  const allMine = G.territories.every(t => t.owner === G.cur);
+  if (allMine) { doVictory(G.players[G.cur]); return true; }
+  return false;
+}
+
+function doVictory(p) {
+  G.gameOver = true; G.phase = 'gameover'; G.winner = p;
+  document.getElementById('vname').textContent = p.name;
+  document.getElementById('vname').style.color = p.color;
+  document.getElementById('vsub').textContent = p.human
+    ? 'The realm bows before your dragon armies!'
+    : 'The AI warlord has conquered all!';
+  document.getElementById('voverlay').classList.add('show');
+  renderAll();
+}
+
+function endPlayerTurn() {
+  if (!G.players[G.cur].human || G.phase === 'gameover' || G.phase === 'ai' || G.phase === 'confirm') return;
+  nextTurn();
+}
+
+function nextTurn() {
+  const active = G.players.filter(p => !p.elim).map(p => p.id);
+  const idx = active.indexOf(G.cur);
+  const nextIdx = (idx + 1) % active.length;
+  const nextId = active[nextIdx];
+
+  if (nextIdx === 0) {
+    G.round++;
+    production();
+    addLog('turn', `=== Round ${G.round} begins ===`);
+  }
+
+  G.cur = nextId;
+  G.src = null; G.dst = null; G.phase = 'select-src'; G.movesDone = 0;
+  addLog('turn', `${G.players[G.cur].name}'s turn.`);
+  renderAll();
+  if (!G.players[G.cur].human) scheduleAI();
+}
+
+// ── AI ───────────────────────────────────────────────────────────────────────
+function scheduleAI() {
+  G.phase = 'ai'; renderAll();
+  setTimeout(doAIStep, 700);
+}
+
+function doAIStep() {
+  if (G.gameOver) return;
+  if (G.movesDone >= 4) { G.phase = 'select-src'; renderAll(); setTimeout(nextTurn, 400); return; }
+
+  const move = bestAIMove(G.cur);
+  if (!move) { G.phase = 'select-src'; renderAll(); setTimeout(nextTurn, 300); return; }
+
+  execMove(move.from, move.to, move.count);
+  G.movesDone++;
+  renderAll();
+  if (checkWin()) return;
+  setTimeout(doAIStep, 550);
+}
+
+function bestAIMove(pid) {
+  const mine = G.territories.filter(t => t.owner === pid && t.dragons > 1)
+                             .sort((a,b) => b.dragons - a.dragons);
+  if (!mine.length) return null;
+
+  // 1. Attack weak neutrals
+  for (const s of mine) {
+    for (const nid of s.neighbors) {
+      const d = G.territories[nid];
+      if (d.owner === -1 && s.dragons > d.dragons + 1)
+        return {from:s.id, to:nid, count: s.dragons - 1};
+    }
+  }
+  // 2. Attack weak enemies with clear advantage
+  for (const s of mine) {
+    for (const nid of s.neighbors) {
+      const d = G.territories[nid];
+      if (d.owner >= 0 && d.owner !== pid && s.dragons > d.dragons + 2)
+        return {from:s.id, to:nid, count: s.dragons - 1};
+    }
+  }
+  // 3. Any neutral
+  for (const s of mine) {
+    for (const nid of s.neighbors) {
+      const d = G.territories[nid];
+      if (d.owner === -1 && s.dragons > d.dragons)
+        return {from:s.id, to:nid, count: s.dragons - 1};
+    }
+  }
+  // 4. Any enemy
+  for (const s of mine) {
+    for (const nid of s.neighbors) {
+      const d = G.territories[nid];
+      if (d.owner >= 0 && d.owner !== pid && s.dragons > d.dragons)
+        return {from:s.id, to:nid, count: s.dragons - 1};
+    }
+  }
+  return null;
+}
+
+// ── RENDER ───────────────────────────────────────────────────────────────────
+function renderAll() { renderMap(); renderPanel(); }
+
+function renderMap() {
+  const CL = document.getElementById('conn-layer');
+  const TL = document.getElementById('terr-layer');
+  CL.innerHTML = ''; TL.innerHTML = '';
+
+  const srcT = G.src !== null ? G.territories[G.src] : null;
+  const validDst = srcT ? srcT.neighbors : [];
+
+  // Connections
+  for (const [a,b] of EDGES) {
+    const ta = G.territories[a], tb = G.territories[b];
+    const lit = srcT && (a===G.src || b===G.src) &&
+                validDst.includes(a===G.src ? b : a);
+    const ln = document.createElementNS('http://www.w3.org/2000/svg','line');
+    ln.setAttribute('x1',ta.x); ln.setAttribute('y1',ta.y);
+    ln.setAttribute('x2',tb.x); ln.setAttribute('y2',tb.y);
+    ln.setAttribute('stroke', lit ? '#ffffaa' : '#2a3e2a');
+    ln.setAttribute('stroke-width', lit ? '3' : '2');
+    ln.setAttribute('stroke-dasharray', lit ? '' : '7,5');
+    ln.setAttribute('opacity', lit ? '0.9' : '0.55');
+    CL.appendChild(ln);
+  }
+
+  // Territories
+  for (const t of G.territories) {
+    const isSrc = G.src === t.id;
+    const isDst = G.dst === t.id;
+    const isVDst = G.phase === 'select-dst' && validDst.includes(t.id);
+    const canClick = (G.phase === 'select-src' && t.owner === G.cur && t.dragons > 1) ||
+                     G.phase === 'select-dst';
+    const R = 34;
+
+    const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.style.cursor = canClick ? 'pointer' : 'default';
+
+    // Glow ring
+    if (isSrc || isDst || isVDst) {
+      const gl = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      gl.setAttribute('cx',t.x); gl.setAttribute('cy',t.y);
+      gl.setAttribute('r', R+8);
+      gl.setAttribute('fill', isSrc ? 'rgba(255,255,255,0.12)' : 'rgba(255,220,0,0.1)');
+      gl.setAttribute('stroke', isSrc ? '#ffffff' : isVDst ? '#ffff44' : '#ff5555');
+      gl.setAttribute('stroke-width','1.5');
+      gl.setAttribute('opacity','0.7');
+      g.appendChild(gl);
+    }
+
+    // Main circle
+    const fill = t.owner >= 0 ? G.players[t.owner].color : '#252525';
+    const stroke = isSrc ? '#ffffff' : isDst ? '#ff4444' : isVDst ? '#ffff44'
+                   : t.type==='stronghold' ? '#ffd700'
+                   : t.type==='capital' ? '#bb8833' : '#444444';
+    const sw = (isSrc || isDst || isVDst) ? '3' : '2';
+    const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',t.x); c.setAttribute('cy',t.y); c.setAttribute('r',R);
+    c.setAttribute('fill',fill); c.setAttribute('stroke',stroke);
+    c.setAttribute('stroke-width',sw);
+    if (t.owner < 0) c.setAttribute('opacity','0.72');
+    g.appendChild(c);
+
+    // Stronghold star
+    if (t.type === 'stronghold') {
+      const star = makeStar(t.x, t.y-4, 13, 6, 5);
+      star.setAttribute('fill','rgba(255,215,0,0.22)');
+      star.setAttribute('stroke','rgba(255,215,0,0.5)');
+      star.setAttribute('stroke-width','1');
+      g.appendChild(star);
+    }
+    // Capital icon
+    if (t.type === 'capital') {
+      const ic = document.createElementNS('http://www.w3.org/2000/svg','text');
+      ic.setAttribute('x',t.x); ic.setAttribute('y',t.y-4);
+      ic.setAttribute('text-anchor','middle'); ic.setAttribute('font-size','13');
+      ic.setAttribute('opacity','0.45'); ic.textContent = '♜';
+      g.appendChild(ic);
+    }
+
+    // Dragon count
+    const dy = t.type==='normal' ? 6 : 8;
+    const ct = document.createElementNS('http://www.w3.org/2000/svg','text');
+    ct.setAttribute('x',t.x); ct.setAttribute('y',t.y+dy);
+    ct.setAttribute('text-anchor','middle'); ct.setAttribute('font-size','15');
+    ct.setAttribute('font-weight','bold');
+    ct.setAttribute('fill', t.owner<0 ? '#888' : '#fff');
+    ct.setAttribute('font-family','Georgia,serif');
+    ct.textContent = t.dragons;
+    g.appendChild(ct);
+
+    // Name
+    const nm = document.createElementNS('http://www.w3.org/2000/svg','text');
+    nm.setAttribute('x',t.x); nm.setAttribute('y',t.y+R+13);
+    nm.setAttribute('text-anchor','middle'); nm.setAttribute('font-size','10');
+    nm.setAttribute('fill', t.owner<0 ? '#777' : G.players[t.owner].light);
+    nm.setAttribute('font-family','Georgia,serif');
+    nm.textContent = t.name;
+    g.appendChild(nm);
+
+    g.addEventListener('click', () => selectTerritory(t.id));
+    TL.appendChild(g);
+  }
+}
+
+function makeStar(cx, cy, ro, ri, n) {
+  const el = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+  let pts = [];
+  for (let i = 0; i < n*2; i++) {
+    const a = (i*Math.PI/n) - Math.PI/2;
+    const r = i%2===0 ? ro : ri;
+    pts.push(`${cx+r*Math.cos(a)},${cy+r*Math.sin(a)}`);
+  }
+  el.setAttribute('points', pts.join(' '));
+  return el;
+}
+
+function renderPanel() {
+  const p = G.players[G.cur];
+  document.getElementById('cur-name').innerHTML =
+    `<span style="color:${p.color}">${p.name}</span>`;
+  document.getElementById('turn-badge').textContent = `Round ${G.round}`;
+
+  const phaseMap = {
+    'select-src':'Select a territory to move from',
+    'select-dst':'Select a target territory',
+    'confirm':'Choose how many dragons to send',
+    'ai':'AI is plotting...',
+    'gameover':'Game over'
+  };
+  document.getElementById('phase-text').textContent = phaseMap[G.phase] || '';
+
+  const mi = document.getElementById('move-info');
+  const ss = document.getElementById('slider-sec');
+  const eb = document.getElementById('end-btn');
+
+  if (G.phase === 'confirm') {
+    const s = G.territories[G.src], d = G.territories[G.dst];
+    const dn = d.owner>=0 ? G.players[d.owner].name : 'Neutral';
+    mi.innerHTML = `From: <span class="hl">${s.name}</span> (${s.dragons} dragons)<br>
+      To: <span class="hl">${d.name}</span> — ${dn}<br>
+      Defending: <span class="hl">${d.dragons}</span>`;
+    ss.style.display = 'block';
+  } else if (G.phase === 'select-dst' && G.src !== null) {
+    const s = G.territories[G.src];
+    mi.innerHTML = `From: <span class="hl">${s.name}</span> (${s.dragons} here)<br>Click a highlighted territory.`;
+    ss.style.display = 'none';
+  } else if (G.phase === 'ai') {
+    mi.innerHTML = `<span style="color:#888">AI is making moves...</span>`;
+    ss.style.display = 'none';
+  } else {
+    mi.innerHTML = p.human ? 'Select one of your territories.' : 'Waiting for AI...';
+    ss.style.display = 'none';
+  }
+
+  eb.disabled = !p.human || G.phase==='gameover' || G.phase==='ai' || G.phase==='confirm';
+
+  // Players list
+  const pl = document.getElementById('players-list');
+  pl.innerHTML = '';
+  for (const q of G.players) {
+    const owned = G.territories.filter(t=>t.owner===q.id).length;
+    const drags = G.territories.filter(t=>t.owner===q.id).reduce((s,t)=>s+t.dragons,0);
+    const d = document.createElement('div');
+    d.className = `pentry ${q.elim?'pelim':''}`;
+    const active = q.id===G.cur;
+    d.innerHTML = `
+      <div class="pdot2" style="background:${q.color};${active?'box-shadow:0 0 6px '+q.color:''}"></div>
+      <div class="pstats">
+        <div style="color:${active?q.color:'inherit'}">${q.name} ${q.human?'':'<span style="font-size:.68rem;color:#666">(AI)</span>'}</div>
+        <div class="psub">${q.elim?'Eliminated':`${owned} territories · ${drags} dragons`}</div>
+      </div>`;
+    pl.appendChild(d);
+  }
+}
+
+// ── LOG ──────────────────────────────────────────────────────────────────────
+function addLog(type, msg) {
+  const el = document.getElementById('event-log');
+  const d = document.createElement('div');
+  d.className = `le le-${type}`;
+  d.textContent = msg;
+  el.appendChild(d);
+  el.scrollTop = el.scrollHeight;
+}
+
+// ── MISC ─────────────────────────────────────────────────────────────────────
+function returnToSetup() {
+  document.getElementById('voverlay').classList.remove('show');
+  document.getElementById('game-screen').style.display = 'none';
+  document.getElementById('setup-screen').style.display = 'block';
+}
+
+document.getElementById('dragon-slider').addEventListener('input', function() {
+  document.getElementById('sval').textContent = this.value;
+});
+
+initSetup();
+</script>
 </body>
 </html>
